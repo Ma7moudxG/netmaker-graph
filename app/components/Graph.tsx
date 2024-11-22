@@ -60,7 +60,6 @@ export function Graph({
     }
   }, [selectedNode]);
 
-  console.log(edgeTypes)
   return (
     <div id="app" style={{ height: "100%" }}>
       <ReactFlow

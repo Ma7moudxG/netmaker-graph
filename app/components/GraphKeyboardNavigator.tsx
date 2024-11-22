@@ -1,15 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Node as FlowNode } from "@xyflow/react";
-
-interface Node extends FlowNode {
-    id: string; // Ensure `id` exists
-    position: { x: number; y: number }; // Include `position` if needed
-  }
+import { Node } from "@xyflow/react";  // Ensure Node is imported properly
 
 interface GraphKeyboardNavigatorProps {
-    nodes: Node[]; // Use the updated Node type
-    onFocusNode: (node: Node) => void;
-  }
+  nodes: Node[];  // Ensure the nodes array is of type Node[]
+  onFocusNode: (node: Node) => void; // Callback when a node is focused
+}
 
 export const GraphKeyboardNavigator: React.FC<GraphKeyboardNavigatorProps> = ({
   nodes,
@@ -18,7 +13,7 @@ export const GraphKeyboardNavigator: React.FC<GraphKeyboardNavigatorProps> = ({
   const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
 
   // Find the nearest node in the given direction
-  const findNearestNode = (currentNode: Node | undefined, direction: string) => {
+  const findNearestNode = (currentNode: Node | undefined, direction: string): Node | null => {
     if (!currentNode) return null;
 
     const { position: currentPos } = currentNode;
@@ -64,7 +59,7 @@ export const GraphKeyboardNavigator: React.FC<GraphKeyboardNavigatorProps> = ({
       const nearestNode = findNearestNode(currentNode, event.key);
       if (nearestNode) {
         setCurrentNodeId(nearestNode.id);
-        onFocusNode(nearestNode);
+        onFocusNode(nearestNode); // Ensure nearestNode is passed correctly as a Node
       }
     },
     [currentNodeId, nodes, onFocusNode]
@@ -80,7 +75,7 @@ export const GraphKeyboardNavigator: React.FC<GraphKeyboardNavigatorProps> = ({
   useEffect(() => {
     if (!currentNodeId && nodes.length > 0) {
       setCurrentNodeId(nodes[0].id);
-      onFocusNode(nodes[0]);
+      onFocusNode(nodes[0]);  // Ensure onFocusNode expects a Node
     }
   }, [nodes, currentNodeId, onFocusNode]);
 

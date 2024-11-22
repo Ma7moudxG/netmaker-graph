@@ -21,8 +21,6 @@ export default function Home() {
   // Callback when a node gains focus
   const handleFocusNode = (node: Node) => {
     setFocusedNode(node);
-
-    console.log(`Focused Node: ${node.data.label}`);
   };
 
   const [viewportSize, setViewportSize] = useState({
