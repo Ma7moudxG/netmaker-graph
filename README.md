@@ -105,7 +105,9 @@ Copy code
 ├── tailwind.config.js    # Tailwind CSS configuration
 
 └── tsconfig.json         # TypeScript configuration
+
 Notable Files:
+--------------
 /pages/index.tsx: The main entry point of the app, where the graph is rendered.
 /components/Graph.tsx: The component responsible for rendering the graph structure using XYFlow.
 /components/SearchBar.tsx: A search bar to filter nodes by their labels.
