@@ -1,0 +1,3 @@
+[build]
+  command = "npm run build"  # Or "next build" if using the default Next.js build command
+  publish = ".next"
