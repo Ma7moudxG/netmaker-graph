@@ -76,8 +76,11 @@ This will serve the optimized build at http://localhost:3000.
 Key Features
 ------------
 Dynamic Graph Rendering: The graph is rendered using the XYFlow library, with nodes and edges that are fetched from an API.
+
 Responsive Layout: The graph layout adapts to different screen sizes, with smaller screens showing a more compact graph.
+
 Node Search: Users can search for nodes by name, and the graph will filter nodes and edges based on the query.
+
 Keyboard Navigation: Users can navigate between nodes using keyboard shortcuts.
 
 
