@@ -1,101 +1,202 @@
-import Image from "next/image";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { Graph } from "./components/Graph";
+import { useEffect, useState, useCallback } from "react";
+import { Node, Edge, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
+import { SearchBar } from "./components/SearchBar";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [filteredNodes, setFilteredNodes] = useState<Node[]>([]);
+  const [filteredEdges, setFilteredEdges] = useState<Edge[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const [viewportSize, setViewportSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  // Update viewport on resizing
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    fetch("https://graph-server.netlify.app/nodes")
+      .then((res) => res.json())
+      .then((data) => {
+        fetch("http://localhost:3000/edges")
+          .then((res) => res.json())
+          .then((edgeData) => {
+            const edgeCounts: Record<string, number> = edgeData.reduce(
+              (acc: Record<string, number>, edge: any) => {
+                acc[edge.source] = (acc[edge.source] || 0) + 1;
+                acc[edge.target] = (acc[edge.target] || 0) + 1;
+                return acc;
+              },
+              {}
+            );
+
+            const isSmallScreen = viewportSize.width < 768; // Small screens 
+
+            // layouts parameters 
+            const centerX = viewportSize.width / 2;
+            const centerY = viewportSize.height / 2;
+            const radiusX = isSmallScreen
+              ? Math.min(viewportSize.width, viewportSize.height) / 3
+              : viewportSize.width / 4; // small screens
+            const radiusY = isSmallScreen
+              ? Math.min(viewportSize.height, viewportSize.width) / 2.2
+              : viewportSize.height / 4;
+            const angleStep = (2 * Math.PI) / data.length;
+
+            const processedNodes = data.map((node: any, index: number) => {
+              const angle = index * angleStep;
+              const connections = edgeCounts[node.id] || 0;
+
+              return {
+                id: String(node.id),
+                type: "",
+                data: { label: node.data.label },
+                position: isSmallScreen
+                  ? {
+                      x: centerX + radiusX * Math.cos(angle),
+                      y:
+                        centerY +
+                        radiusY *
+                          Math.sin(angle) *
+                          (connections > 2 ? 1.2 : 1), // Stretch for more connections
+                    }
+                  : {
+                      x: centerX + radiusX * Math.cos(angle),
+                      y: centerY + radiusY * Math.sin(angle),
+                    },
+                style: {
+                  background: node.color,
+                  width: 50 * (connections > 2 ? 1.2 : 1), // Larger nodes for more connections
+                  height: 50 * (connections > 2 ? 1.2 : 1),
+                  borderRadius: "50%",
+                },
+              };
+            });
+
+            const processedEdges = edgeData.map((edge: any) => ({
+              id: `${edge.source}-${edge.target}`,
+              source: String(edge.source),
+              target: String(edge.target),
+              animated: true,
+              style: { stroke: edge.color },
+            }));
+
+            setNodes(processedNodes);
+            setFilteredNodes(processedNodes); // Initial filtered nodes
+            setEdges(processedEdges);
+            setFilteredEdges(processedEdges); // Initial filtered edges
+          })
+          .catch((err) => setError("Failed to fetch edges: " + err.message))
+          .finally(() => setLoading(false));
+      })
+      .catch((err) => setError("Failed to fetch nodes: " + err.message))
+      .finally(() => setLoading(false));
+  }, [viewportSize]);
+
+  const filterGraph = (query: string) => {
+    const lowerCaseQuery = query.toLowerCase();
+
+    const filteredNodeIds = new Set(
+      nodes
+        .filter((node) => node.data.label.toLowerCase().includes(lowerCaseQuery))
+        .map((node) => node.id)
+    );
+
+    setFilteredNodes(
+      nodes.map((node) => ({
+        ...node,
+        style: {
+          ...node.style,
+          opacity: filteredNodeIds.has(node.id) ? 1 : 0.3,
+        },
+      }))
+    );
+
+    setFilteredEdges(
+      edges.map((edge) => ({
+        ...edge,
+        style: {
+          ...edge.style,
+          opacity:
+            filteredNodeIds.has(edge.source) || filteredNodeIds.has(edge.target)
+              ? 1
+              : 0.2,
+        },
+      }))
+    );
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value; 
+    setQuery(value);
+    filterGraph(value);
+  };
+
+  const onNodeChange = useCallback(
+    (changes: any) =>
+      setFilteredNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
+
+  const onEdgeChange = useCallback(
+    (changes: any) =>
+      setFilteredEdges((eds) => applyEdgeChanges(changes, eds)),
+    []
+  );
+
+  return (
+    <div
+      className="w-screen h-screen flex flex-col items-center justify-center"
+      role="main"
+    >
+      {/* Search Filter */}
+      <SearchBar query={query} onChange={handleInputChange}/>
+
+      {/* Loading and Error handling */}
+      {loading && <p role="status">Loading graph data...</p>}
+
+      {error && <p role="alert" className="text-red-500">{error}</p>}
+
+      {!loading && !filteredNodes.length && !error && (
+        <p className="text-gray-500">No nodes found for {query}.</p>
+      )}
+
+      {/* Graph */}
+      <div
+        className="w-[100%] h-[100%] relative"
+        tabIndex={0}
+        role="application"
+        aria-label="Interactive Graph"
+      >
+        <Graph
+          nodes={filteredNodes}
+          edges={filteredEdges}
+          onNodeChange={onNodeChange}
+          onEdgeChange={onEdgeChange}
+        />
+      </div>
     </div>
   );
 }
