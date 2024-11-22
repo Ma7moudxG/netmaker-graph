@@ -106,9 +106,11 @@ export default function Home() {
               id: `${edge.source}-${edge.target}`,
               source: String(edge.source),
               target: String(edge.target),
-              animated: true,
+              animated: edge.animated ?? false, // Use edge.animated if available, otherwise default to false
               style: { stroke: edge.color },
+              markerEnd: edge.markerEnd || undefined, // Include markerEnd if provided
             }));
+            
 
             setNodes(processedNodes);
             setFilteredNodes(processedNodes); // Initial filtered nodes

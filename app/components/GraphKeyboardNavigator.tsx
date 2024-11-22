@@ -1,10 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Node } from "@xyflow/react";
+import { Node as FlowNode } from "@xyflow/react";
+
+interface Node extends FlowNode {
+    id: string; // Ensure `id` exists
+    position: { x: number; y: number }; // Include `position` if needed
+  }
 
 interface GraphKeyboardNavigatorProps {
-  nodes: Node[];
-  onFocusNode: (node: Node) => void; // Callback when a node is focused
-}
+    nodes: Node[]; // Use the updated Node type
+    onFocusNode: (node: Node) => void;
+  }
 
 export const GraphKeyboardNavigator: React.FC<GraphKeyboardNavigatorProps> = ({
   nodes,

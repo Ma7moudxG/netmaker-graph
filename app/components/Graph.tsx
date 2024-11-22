@@ -3,8 +3,9 @@ import { ReactFlow, Controls, Background } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Node, Edge, BackgroundVariant } from "@xyflow/react";
 import CircleNode from "./CircleNode.jsx";
-import ButtonEdge from "./ButtonEdge";
+
 import React, { useEffect, useState } from "react";
+
 
 interface NodeData extends Record<string, unknown> {
   label: string;
@@ -31,7 +32,7 @@ export function Graph({
   };
 
   const edgeTypes = {
-    button: ButtonEdge,
+    // button: ButtonEdge,
   };
 
   const handleNodeClick = (event: any, node: Node<NodeData>) => {
@@ -59,6 +60,7 @@ export function Graph({
     }
   }, [selectedNode]);
 
+  console.log(edgeTypes)
   return (
     <div id="app" style={{ height: "100%" }}>
       <ReactFlow

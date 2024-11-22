@@ -16,21 +16,21 @@
     { "id": 14,"type": "circle", "data": { "label": "" }, "color": "#739B3C" }
   ],
   "edges": [
-    { "source": 3, "target": 1, "color": "#6846C3", "animated": true },
-    { "source": 4, "target": 1, "color": "#6846C3", "animated": true },
-    { "source": 5, "target": 1, "color": "#6846C3" , "animated": true},
-    { "source": 6, "target": 1, "color": "#6846C3", "animated": true },
-    { "source": 7, "target": 1, "color": "#6846C3", "animated": true },
-    { "source": 8, "target": 1, "color": "#6846C3", "animated": true },
-    { "source": 9, "target": 1, "color": "#6846C3" , "animated": true},
-    { "source": 10, "target": 1, "color": "#6846C3", "animated": true },
-    { "source": 1, "target": 11, "color": "#739B3C", "animated": true },
-    { "source": 1, "target": 12, "color": "#888788", "animated": true },
-    { "source": 1, "target": 13, "color": "#888788", "animated": true },
-    { "source": 1, "target": 2, "color": "#888788", "animated": true },
-    { "source": 12, "target": 2, "color": "#888788", "animated": true },
-    { "source": 13, "target": 2, "color": "#888788", "animated": true },
-    { "source": 13, "target": 12, "color": "#888788", "animated": true },
-    { "source": 13, "target": 14, "color": "#739B3C", "animated": true }
+    { "source": 3, "target": 1, "color": "#6846C3", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 4, "target": 1, "color": "#6846C3", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 5, "target": 1, "color": "#6846C3" , "animated": true, "markerEnd": "url(#arrowhead)"},
+    { "source": 6, "target": 1, "color": "#6846C3", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 7, "target": 1, "color": "#6846C3", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 8, "target": 1, "color": "#6846C3", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 9, "target": 1, "color": "#6846C3" , "animated": true, "markerEnd": "url(#arrowhead)"},
+    { "source": 10, "target": 1, "color": "#6846C3", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 1, "target": 11, "color": "#739B3C", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 1, "target": 12, "color": "#888788", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 1, "target": 13, "color": "#888788", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 1, "target": 2, "color": "#888788", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 12, "target": 2, "color": "#888788", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 13, "target": 2, "color": "#888788", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 13, "target": 12, "color": "#888788", "animated": true , "markerEnd": "url(#arrowhead)"},
+    { "source": 13, "target": 14, "color": "#739B3C", "animated": true , "markerEnd": "url(#arrowhead)"}
   ]
 }
