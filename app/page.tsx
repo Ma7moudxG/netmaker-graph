@@ -27,20 +27,39 @@ export default function Home() {
     setFocusedNode(node);
   };
 
+  
   const [viewportSize, setViewportSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 0,
+    height: 0,
   });
 
+  
+
   useEffect(() => {
-    const handleResize = () => {
+    // This code runs only on the client side because window is only available in the browser
+    if (typeof window !== 'undefined') {
+      // Set initial dimensions
       setViewportSize({
         width: window.innerWidth,
         height: window.innerHeight,
       });
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+      // Set up event listener for resize
+      const handleResize = () => {
+        setViewportSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      };
+
+      // Listen for window resize events
+      window.addEventListener("resize", handleResize);
+
+      // Cleanup event listener on component unmount
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }
   }, []);
 
   useEffect(() => {
