@@ -4,7 +4,7 @@ import "@xyflow/react/dist/style.css";
 import { Node, Edge, BackgroundVariant } from "@xyflow/react";
 import CircleNode from "./CircleNode.jsx";
 import ButtonEdge from "./ButtonEdge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface NodeData extends Record<string, unknown> {
   label: string;
@@ -15,11 +15,13 @@ export function Graph({
   edges,
   onNodeChange,
   onEdgeChange,
+  selectedNode, // Add a prop for the currently selected node
 }: {
   nodes: Node<NodeData>[];
   edges: Edge[];
   onNodeChange: any;
   onEdgeChange: any;
+  selectedNode: Node<NodeData> | null; // Track the focused node
 }) {
   const [hoveredNode, setHoveredNode] = useState<Node<NodeData> | null>(null);
   const [popupData, setPopupData] = useState<Node<NodeData> | null>(null);
@@ -31,35 +33,42 @@ export function Graph({
   const edgeTypes = {
     button: ButtonEdge,
   };
-  
+
   const handleNodeClick = (event: any, node: Node<NodeData>) => {
-      setHoveredNode(null)
-    setPopupData(node); 
+    setHoveredNode(null);
+    setPopupData(node);
   };
 
   const handleNodeHover = (event: any, node: Node<NodeData>) => {
     setPopupData(null);
-    setHoveredNode(node); 
+    setHoveredNode(node);
   };
 
   const handleNodeHoverLeave = () => {
-    setHoveredNode(null); 
+    setHoveredNode(null);
   };
 
   const handlePopupClose = () => {
-    setPopupData(null); 
+    setPopupData(null);
   };
+
+  // Open popup when the selected node changes
+  useEffect(() => {
+    if (selectedNode) {
+      setPopupData(selectedNode);
+    }
+  }, [selectedNode]);
 
   return (
     <div id="app" style={{ height: "100%" }}>
       <ReactFlow
-         nodes={nodes.map((node) => ({
-            ...node,
-            data: {
-              ...node.data, 
-              showLabel: false, 
-            },
-          }))}
+        nodes={nodes.map((node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            showLabel: false,
+          },
+        }))}
         edges={edges}
         onNodesChange={onNodeChange}
         onEdgesChange={onEdgeChange}
@@ -79,7 +88,7 @@ export function Graph({
         <div
           style={{
             position: "absolute",
-            left: hoveredNode.position.x - 50, 
+            left: hoveredNode.position.x - 50,
             top: hoveredNode.position.y - 40,
             background: "white",
             border: "1px solid gray",
@@ -93,12 +102,12 @@ export function Graph({
         </div>
       )}
 
-      {/* Popup on click */}
+      {/* Popup on click or selection */}
       {popupData && (
         <div
           style={{
             position: "absolute",
-            left: popupData.position.x - 50, 
+            left: popupData.position.x - 50,
             top: popupData.position.y - 40,
             background: "white",
             border: "1px solid gray",

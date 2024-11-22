@@ -5,6 +5,7 @@ import { Graph } from "./components/Graph";
 import { useEffect, useState, useCallback } from "react";
 import { Node, Edge, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
 import { SearchBar } from "./components/SearchBar";
+import { GraphKeyboardNavigator } from "./components/GraphKeyboardNavigator"; // Import the component
 
 export default function Home() {
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -14,6 +15,15 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [focusedNode, setFocusedNode] = useState<Node | null>(null);
+
+  // Callback when a node gains focus
+  const handleFocusNode = (node: Node) => {
+    setFocusedNode(node);
+
+    console.log(`Focused Node: ${node.data.label}`);
+  };
 
   const [viewportSize, setViewportSize] = useState({
     width: window.innerWidth,
@@ -27,7 +37,6 @@ export default function Home() {
         width: window.innerWidth,
         height: window.innerHeight,
       });
-      
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -40,7 +49,7 @@ export default function Home() {
     fetch("https://graph-server.netlify.app/nodes")
       .then((res) => res.json())
       .then((data) => {
-        fetch("http://localhost:3000/edges")
+        fetch("https://graph-server.netlify.app/edges")
           .then((res) => res.json())
           .then((edgeData) => {
             const edgeCounts: Record<string, number> = edgeData.reduce(
@@ -52,9 +61,9 @@ export default function Home() {
               {}
             );
 
-            const isSmallScreen = viewportSize.width < 768; // Small screens 
+            const isSmallScreen = viewportSize.width < 768; // Small screens
 
-            // layouts parameters 
+            // layouts parameters
             const centerX = viewportSize.width / 2;
             const centerY = viewportSize.height / 2;
             const radiusX = isSmallScreen
@@ -78,9 +87,7 @@ export default function Home() {
                       x: centerX + radiusX * Math.cos(angle),
                       y:
                         centerY +
-                        radiusY *
-                          Math.sin(angle) *
-                          (connections > 2 ? 1.2 : 1), // Stretch for more connections
+                        radiusY * Math.sin(angle) * (connections > 2 ? 1.2 : 1), // Stretch for more connections
                     }
                   : {
                       x: centerX + radiusX * Math.cos(angle),
@@ -120,7 +127,9 @@ export default function Home() {
 
     const filteredNodeIds = new Set(
       nodes
-        .filter((node) => node.data.label.toLowerCase().includes(lowerCaseQuery))
+        .filter((node) =>
+          node.data.label.toLowerCase().includes(lowerCaseQuery)
+        )
         .map((node) => node.id)
     );
 
@@ -149,20 +158,18 @@ export default function Home() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value; 
+    const value = e.target.value;
     setQuery(value);
     filterGraph(value);
   };
 
   const onNodeChange = useCallback(
-    (changes: any) =>
-      setFilteredNodes((nds) => applyNodeChanges(changes, nds)),
+    (changes: any) => setFilteredNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
   const onEdgeChange = useCallback(
-    (changes: any) =>
-      setFilteredEdges((eds) => applyEdgeChanges(changes, eds)),
+    (changes: any) => setFilteredEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
@@ -172,16 +179,22 @@ export default function Home() {
       role="main"
     >
       {/* Search Filter */}
-      <SearchBar query={query} onChange={handleInputChange}/>
+      <SearchBar query={query} onChange={handleInputChange} />
 
       {/* Loading and Error handling */}
       {loading && <p role="status">Loading graph data...</p>}
 
-      {error && <p role="alert" className="text-red-500">{error}</p>}
+      {error && (
+        <p role="alert" className="text-red-500">
+          {error}
+        </p>
+      )}
 
       {!loading && !filteredNodes.length && !error && (
         <p className="text-gray-500">No nodes found for {query}.</p>
       )}
+
+      <p>Use keyboard to navigate between nodes</p>
 
       {/* Graph */}
       <div
@@ -191,10 +204,21 @@ export default function Home() {
         aria-label="Interactive Graph"
       >
         <Graph
-          nodes={filteredNodes}
+          nodes={filteredNodes.map((node) =>
+            node.id === focusedNode?.id
+              ? { ...node, style: { ...node.style, border: "3px solid blue" } }
+              : node
+          )}
           edges={filteredEdges}
           onNodeChange={onNodeChange}
           onEdgeChange={onEdgeChange}
+          selectedNode={focusedNode} // Pass the currently focused node
+        />
+
+        {/* Keyboard Navigation */}
+        <GraphKeyboardNavigator
+          nodes={filteredNodes}
+          onFocusNode={handleFocusNode}
         />
       </div>
     </div>
