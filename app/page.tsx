@@ -2,7 +2,7 @@
 "use client";
 
 import { Graph } from "./components/Graph";
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Node, Edge, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
 import { SearchBar } from "./components/SearchBar";
 import { GraphKeyboardNavigator } from "./components/GraphKeyboardNavigator"; // Import the component

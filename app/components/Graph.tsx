@@ -4,7 +4,7 @@ import "@xyflow/react/dist/style.css";
 import { Node, Edge, BackgroundVariant } from "@xyflow/react";
 import CircleNode from "./CircleNode.jsx";
 import ButtonEdge from "./ButtonEdge";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface NodeData extends Record<string, unknown> {
   label: string;
