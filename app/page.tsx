@@ -5,21 +5,25 @@ import { Graph } from "./components/Graph";
 import React, { useEffect, useState, useCallback } from "react";
 import { Node, Edge, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
 import { SearchBar } from "./components/SearchBar";
-import { GraphKeyboardNavigator } from "./components/GraphKeyboardNavigator"; // Import the component
+import { GraphKeyboardNavigator } from "./components/GraphKeyboardNavigator";
+
+// Define NodeData type, which extends Record<string, unknown>
+interface NodeData extends Record<string, unknown> {
+  label: string;
+}
 
 export default function Home() {
-  const [nodes, setNodes] = useState<Node[]>([]);
+  const [nodes, setNodes] = useState<Node<NodeData>[]>([]); // Properly typed Node state
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [filteredNodes, setFilteredNodes] = useState<Node[]>([]);
+  const [filteredNodes, setFilteredNodes] = useState<Node<NodeData>[]>([]);
   const [filteredEdges, setFilteredEdges] = useState<Edge[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [focusedNode, setFocusedNode] = useState<Node | null>(null);
+  const [focusedNode, setFocusedNode] = useState<Node<NodeData> | null>(null);
 
-  // Callback when a node gains focus
-  const handleFocusNode = (node: Node) => {
+  const handleFocusNode = (node: Node<NodeData>) => {
     setFocusedNode(node);
   };
 
@@ -28,7 +32,6 @@ export default function Home() {
     height: window.innerHeight,
   });
 
-  // Update viewport on resizing
   useEffect(() => {
     const handleResize = () => {
       setViewportSize({
@@ -59,14 +62,13 @@ export default function Home() {
               {}
             );
 
-            const isSmallScreen = viewportSize.width < 768; // Small screens
+            const isSmallScreen = viewportSize.width < 768; 
 
-            // layouts parameters
             const centerX = viewportSize.width / 2;
             const centerY = viewportSize.height / 2;
             const radiusX = isSmallScreen
               ? Math.min(viewportSize.width, viewportSize.height) / 3
-              : viewportSize.width / 4; // small screens
+              : viewportSize.width / 4; 
             const radiusY = isSmallScreen
               ? Math.min(viewportSize.height, viewportSize.width) / 2.2
               : viewportSize.height / 4;
@@ -85,7 +87,7 @@ export default function Home() {
                       x: centerX + radiusX * Math.cos(angle),
                       y:
                         centerY +
-                        radiusY * Math.sin(angle) * (connections > 2 ? 1.2 : 1), // Stretch for more connections
+                        radiusY * Math.sin(angle) * (connections > 2 ? 1.2 : 1),
                     }
                   : {
                       x: centerX + radiusX * Math.cos(angle),
@@ -93,7 +95,7 @@ export default function Home() {
                     },
                 style: {
                   background: node.color,
-                  width: 50 * (connections > 2 ? 1.2 : 1), // Larger nodes for more connections
+                  width: 50 * (connections > 2 ? 1.2 : 1),
                   height: 50 * (connections > 2 ? 1.2 : 1),
                   borderRadius: "50%",
                 },
@@ -104,16 +106,15 @@ export default function Home() {
               id: `${edge.source}-${edge.target}`,
               source: String(edge.source),
               target: String(edge.target),
-              animated: edge.animated ?? false, // Use edge.animated if available, otherwise default to false
+              animated: edge.animated ?? false,
               style: { stroke: edge.color },
-              markerEnd: edge.markerEnd || undefined, // Include markerEnd if provided
+              markerEnd: edge.markerEnd || undefined,
             }));
-            
 
             setNodes(processedNodes);
-            setFilteredNodes(processedNodes); // Initial filtered nodes
+            setFilteredNodes(processedNodes);
             setEdges(processedEdges);
-            setFilteredEdges(processedEdges); // Initial filtered edges
+            setFilteredEdges(processedEdges);
           })
           .catch((err) => setError("Failed to fetch edges: " + err.message))
           .finally(() => setLoading(false));
@@ -178,12 +179,9 @@ export default function Home() {
       className="w-screen h-screen flex flex-col items-center justify-center"
       role="main"
     >
-      {/* Search Filter */}
       <SearchBar query={query} onChange={handleInputChange} />
 
-      {/* Loading and Error handling */}
       {loading && <p role="status">Loading graph data...</p>}
-
       {error && (
         <p role="alert" className="text-red-500">
           {error}
@@ -196,7 +194,6 @@ export default function Home() {
 
       <p>Use keyboard to navigate between nodes</p>
 
-      {/* Graph */}
       <div
         className="w-[100%] h-[100%] relative"
         tabIndex={0}
@@ -212,13 +209,12 @@ export default function Home() {
           edges={filteredEdges}
           onNodeChange={onNodeChange}
           onEdgeChange={onEdgeChange}
-          selectedNode={focusedNode} // Pass the currently focused node
+          selectedNode={focusedNode}
         />
 
-        {/* Keyboard Navigation */}
         <GraphKeyboardNavigator
           nodes={filteredNodes}
-          onFocusNode={handleFocusNode}
+          onFocusNode={(node) => handleFocusNode(node as Node<NodeData>)} // Explicit type casting
         />
       </div>
     </div>
