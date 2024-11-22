@@ -89,13 +89,21 @@ bash
 Copy code
 /graph-project
 ├── /components           # Contains React components like Graph, SearchBar, etc.
+
 ├── /pages                # Contains Next.js pages (main entry point for the app)
+
 ├── /public               # Static assets (images, icons, etc.)
+
 ├── /styles               # Tailwind CSS styles
+
 ├── /types                # TypeScript types
+
 ├── /utils                # Utility functions (e.g., for API calls)
+
 ├── package.json          # Project configuration and dependencies
+
 ├── tailwind.config.js    # Tailwind CSS configuration
+
 └── tsconfig.json         # TypeScript configuration
 Notable Files:
 /pages/index.tsx: The main entry point of the app, where the graph is rendered.
